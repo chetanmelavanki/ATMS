@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Student Profile</title>
+    <title>View All Students</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         html, body {
@@ -19,7 +19,7 @@
         }
         .container {
             flex: 1;
-            max-width: 800px;
+            max-width: 1000px;
             margin-top: 20px;
         }
         footer {
@@ -52,7 +52,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="delete_student_profile.jsp">Delete Student</a>
                     </li>
-        
                 </ul>
             </div>
         </div>
@@ -60,61 +59,67 @@
 
     <!-- Main Content -->
     <div class="container">
-        <h4 class="mb-4">View Student Profile</h4>
-        <form action="view_students_profile.jsp" method="get">
-            <div class="mb-3">
-                <label for="usn" class="form-label">USN</label>
-                <input type="text" name="usn" id="usn" class="form-control" placeholder="Enter USN" required>
-            </div>
-            <button type="submit" class="btn btn-primary">View Profile</button>
-        </form>
+        <h4 class="mb-4">All Student Profiles</h4>
 
-        <!-- JSP Logic for displaying student profile -->
+        <!-- JSP Logic for displaying all student profiles -->
         <%
-            String usn = request.getParameter("usn");
-            if (usn != null && !usn.isEmpty()) {
-                String dbUrl = "jdbc:mysql://localhost:3306/atms"; // Update with your DB name
-                String dbUser = "root"; // Update with your DB username
-                String dbPassword = "ROOT"; // Update with your DB password
+            String dbUrl = "jdbc:mysql://localhost:3306/atms"; // Update with your DB name
+            String dbUser = "root"; // Update with your DB username
+            String dbPassword = "ROOT"; // Update with your DB password
 
-                try {
-                    Class.forName("com.mysql.cj.jdbc.Driver"); // Load the MySQL driver
-                    Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
-                    String sql = "SELECT * FROM STUDENT WHERE USN = ?";
-                    PreparedStatement stmt = conn.prepareStatement(sql);
-                    stmt.setString(1, usn);
-                    ResultSet rs = stmt.executeQuery();
-
-                    if (rs.next()) {
-                        %>
-                        <table class="table table-bordered">
-                            <tr><th>USN</th><td><%= rs.getString("USN") %></td></tr>
-                            <tr><th>Student Name</th><td><%= rs.getString("Student_Name") %></td></tr>
-                            <tr><th>Date of Birth</th><td><%= rs.getDate("Student_DOB") %></td></tr>
-                            <tr><th>Gender</th><td><%= rs.getString("Student_Gender") %></td></tr>
-                            <tr><th>Email</th><td><%= rs.getString("Student_Email") %></td></tr>
-                            <tr><th>Phone Number</th><td><%= rs.getString("Student_Phone_Number") %></td></tr>
-                            <tr><th>Date of Admission</th><td><%= rs.getDate("Date_Of_Admission") %></td></tr>
-                            <tr><th>Qualification</th><td><%= rs.getString("Student_Qualification") %></td></tr>
-                            <tr><th>Address</th><td><%= rs.getString("Student_Address") %></td></tr>
-                            <tr><th>Branch ID</th><td><%= rs.getInt("Branch_Id") %></td></tr>
-                            <tr><th>Year of Study</th><td><%= rs.getString("Year_Of_Study") %></td></tr>
-                        </table>
-                        <%
-                    } else {
-                        %>
-                        <div class="alert alert-warning">Student with USN <%= usn %> not found.</div>
-                        <%
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver"); // Load the MySQL driver
+                Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+                String sql = "SELECT * FROM STUDENT";
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql);
+        %>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>USN</th>
+                    <th>Student Name</th>
+                    <th>Date of Birth</th>
+                    <th>Gender</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Date of Admission</th>
+                    <th>Qualification</th>
+                    <th>Address</th>
+                    <th>Branch ID</th>
+                    <th>Year of Study</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%
+                    while (rs.next()) {
+                %>
+                <tr>
+                    <td><%= rs.getString("USN") %></td>
+                    <td><%= rs.getString("Student_Name") %></td>
+                    <td><%= rs.getDate("Student_DOB") %></td>
+                    <td><%= rs.getString("Student_Gender") %></td>
+                    <td><%= rs.getString("Student_Email") %></td>
+                    <td><%= rs.getString("Student_Phone_Number") %></td>
+                    <td><%= rs.getDate("Date_Of_Admission") %></td>
+                    <td><%= rs.getString("Student_Qualification") %></td>
+                    <td><%= rs.getString("Student_Address") %></td>
+                    <td><%= rs.getInt("Branch_Id") %></td>
+                    <td><%= rs.getString("Year_Of_Study") %></td>
+                </tr>
+                <%
                     }
-
-                    rs.close();
-                    stmt.close();
-                    conn.close();
-                } catch (SQLException | ClassNotFoundException e) {
-                    %>
-                    <div class="alert alert-danger">Error: <%= e.getMessage() %></div>
-                    <%
-                }
+                %>
+            </tbody>
+        </table>
+        <%
+                rs.close();
+                stmt.close();
+                conn.close();
+            } catch (SQLException | ClassNotFoundException e) {
+        %>
+        <div class="alert alert-danger">Error: <%= e.getMessage() %></div>
+        <%
             }
         %>
     </div>

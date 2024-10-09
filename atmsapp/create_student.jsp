@@ -71,10 +71,6 @@
                 <input type="text" id="usn" name="usn" class="form-control" placeholder="Enter USN" required>
             </div>
             <div class="mb-3">
-                <label for="email" class="form-label">Email Address</label>
-                <input type="email" id="email" name="email" class="form-control" placeholder="user@example.com" required>
-            </div>
-            <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
                 <input type="password" id="password" name="password" class="form-control" required>
             </div>
@@ -89,10 +85,9 @@
 
             // Get form parameters
             String usn = request.getParameter("usn");
-            String email = request.getParameter("email");
             String userPassword = request.getParameter("password");
 
-            if (usn != null && email != null && userPassword != null) {
+            if (usn != null && userPassword != null) {
                 Connection conn = null;
                 PreparedStatement stmt = null;
                 try {
@@ -101,11 +96,10 @@
                     conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
 
                     // SQL statement to insert data
-                    String sql = "INSERT INTO STUDENT_USER (USN, Email, Pw, Student_Role) VALUES (?, ?, ?, 'Student')";
+                    String sql = "INSERT INTO STUDENT_USER (USN, Pw, Student_Role) VALUES (?, ?, 'Student')";
                     stmt = conn.prepareStatement(sql);
                     stmt.setString(1, usn);
-                    stmt.setString(2, email);
-                    stmt.setString(3, userPassword);
+                    stmt.setString(2, userPassword);
 
                     // Execute the insert operation
                     int rowsInserted = stmt.executeUpdate();

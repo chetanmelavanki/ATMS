@@ -63,7 +63,6 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Email</th>
                     <th>Faculty ID</th>
                     <th>Password</th>
                 </tr>
@@ -85,20 +84,18 @@
                         conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
 
                         // Query to fetch faculty users
-                        String sql = "SELECT Email, Faculty_Id, Pw FROM FACULTY_USER";
+                        String sql = "SELECT Faculty_Id, Pw FROM FACULTY_USER";
                         stmt = conn.prepareStatement(sql);
                         rs = stmt.executeQuery();
 
                         // Loop through the result set and display each faculty user in the table
                         while (rs.next()) {
-                            String email = rs.getString("Email");
                             String facultyId = rs.getString("Faculty_Id");
                             String password = rs.getString("Pw"); // Fetch the password
                 %>
                             <tr>
-                                <td><%= email %></td>
-                                <td><%= facultyId %></td>
-                                <td><%= password %></td> <!-- Display the password -->
+                                <td><%= facultyId != null ? facultyId : "N/A" %></td>
+                                <td><%= password != null ? password : "N/A" %></td> <!-- Display the password -->
                             </tr>
                 <%
                         }

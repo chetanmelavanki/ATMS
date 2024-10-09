@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*" %>
+<%@ page import="java.sql.*, java.security.MessageDigest, java.security.NoSuchAlgorithmException" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -63,16 +63,6 @@
 
         <form action="update_student.jsp" method="post">
             <div class="mb-3">
-                <label for="email" class="form-label">Email Address</label>
-                <input type="email" id="email" name="email" class="form-control" placeholder="user@example.com" required>
-            </div>
-            <div class="mb-3">
-                <label for="studentRole" class="form-label">Role</label>
-                <select id="studentRole" class="form-select" disabled>
-                    <option value="Student" selected>Student</option>
-                </select>
-            </div>
-            <div class="mb-3">
                 <label for="usn" class="form-label">USN</label>
                 <input type="text" id="usn" name="usn" class="form-control" placeholder="USN" required>
             </div>
@@ -83,6 +73,78 @@
             </div>
             <button type="submit" class="btn btn-primary">Update Student User</button>
         </form>
+
+        <%
+            // Handle form submission and database update
+            if (request.getMethod().equalsIgnoreCase("POST")) {
+                String usn = request.getParameter("usn");
+                String password = request.getParameter("password");
+
+                Connection conn = null;
+                PreparedStatement stmt = null;
+                ResultSet rs = null;
+
+                try {
+                    // Database connection
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    String dbUrl = "jdbc:mysql://localhost:3306/atms";
+                    String dbUser = "root";
+                    String dbPassword = "ROOT";
+                    conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+
+                    // Check if the student exists
+                    String checkSql = "SELECT Pw FROM STUDENT_USER WHERE USN = ?";
+                    stmt = conn.prepareStatement(checkSql);
+                    stmt.setString(1, usn);
+                    rs = stmt.executeQuery();
+
+                    if (rs.next()) {
+                        // Get the current password
+                        String currentPassword = rs.getString("Pw");
+
+                        // If no new password provided, keep the current password
+                        if (password == null || password.isEmpty()) {
+                            password = currentPassword;
+                        } else {
+                            // Hash the new password using SHA-256
+                            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                            byte[] hash = digest.digest(password.getBytes("UTF-8"));
+                            StringBuilder hexString = new StringBuilder();
+                            for (byte b : hash) {
+                                String hex = Integer.toHexString(0xff & b);
+                                if (hex.length() == 1) hexString.append('0');
+                                hexString.append(hex);
+                            }
+                            password = hexString.toString();
+                        }
+
+                        // Update student details
+                        String updateSql = "UPDATE STUDENT_USER SET Pw = ? WHERE USN = ?";
+                        stmt = conn.prepareStatement(updateSql);
+                        stmt.setString(1, password);
+                        stmt.setString(2, usn);
+                        int rowsUpdated = stmt.executeUpdate();
+
+                        if (rowsUpdated > 0) {
+                            out.println("<div class='alert alert-success'>Student user updated successfully!</div>");
+                        } else {
+                            out.println("<div class='alert alert-danger'>Error updating student user.</div>");
+                        }
+                    } else {
+                        out.println("<div class='alert alert-danger'>Student user not found.</div>");
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    out.println("<div class='alert alert-danger'>An error occurred while updating the student user.</div>");
+                } finally {
+                    // Close resources
+                    if (rs != null) try { rs.close(); } catch (SQLException e) { e.printStackTrace(); }
+                    if (stmt != null) try { stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+                    if (conn != null) try { conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+                }
+            }
+        %>
     </div>
 
     <!-- Footer -->
@@ -93,66 +155,3 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-<%
-    // Handle form submission and database update
-    if (request.getMethod().equalsIgnoreCase("POST")) {
-        String email = request.getParameter("email");
-        String usn = request.getParameter("usn");
-        String password = request.getParameter("password");
-
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-
-        try {
-            // Database connection
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            String dbUrl = "jdbc:mysql://localhost:3306/atms";
-            String dbUser = "root";
-            String dbPassword = "ROOT";
-            conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
-
-            // Check if the student exists
-            String checkSql = "SELECT Pw FROM STUDENT_USER WHERE Email = ?";
-            stmt = conn.prepareStatement(checkSql);
-            stmt.setString(1, email);
-            rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                // Get the current password
-                String currentPassword = rs.getString("Pw");
-
-                // If no new password provided, keep the current password
-                if (password == null || password.isEmpty()) {
-                    password = currentPassword;
-                }
-
-                // Update student details
-                String updateSql = "UPDATE STUDENT_USER SET Pw = ?, USN = ? WHERE Email = ?";
-                stmt = conn.prepareStatement(updateSql);
-                stmt.setString(1, password);
-                stmt.setString(2, usn);
-                stmt.setString(3, email);
-                int rowsUpdated = stmt.executeUpdate();
-
-                if (rowsUpdated > 0) {
-                    out.println("<div class='alert alert-success'>Student user updated successfully!</div>");
-                } else {
-                    out.println("<div class='alert alert-danger'>Error updating student user.</div>");
-                }
-            } else {
-                out.println("<div class='alert alert-danger'>Student with email " + email + " not found.</div>");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            out.println("<div class='alert alert-danger'>An error occurred while updating the student user.</div>");
-        } finally {
-            // Close resources
-            if (rs != null) try { rs.close(); } catch (SQLException e) { e.printStackTrace(); }
-            if (stmt != null) try { stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
-            if (conn != null) try { conn.close(); } catch (SQLException e) { e.printStackTrace(); }
-        }
-    }
-%>

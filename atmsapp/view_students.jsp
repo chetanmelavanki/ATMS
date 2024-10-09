@@ -60,62 +60,41 @@
     <!-- Main Content -->
     <div class="container">
         <h4 class="mb-4">Student Users</h4>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Email</th>
-                    <th>Password</th>
-                    <th>Role</th>
-                    <th>USN</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% 
-                    // Database connection variables
-                    String dbUrl = "jdbc:mysql://localhost:3306/atms";
-                    String dbUser = "root";
-                    String dbPassword = "ROOT";
-                    Connection conn = null;
-                    Statement stmt = null;
-                    ResultSet rs = null;
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>USN</th>
+                        <th>Password</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% 
+                        // Database connection variables
+                        String dbUrl = "jdbc:mysql://localhost:3306/atms";
+                        String dbUser = "root";
+                        String dbPassword = "ROOT";
 
-                    try {
-                        // Load MySQL JDBC Driver
-                        Class.forName("com.mysql.cj.jdbc.Driver");
+                        try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+                             Statement stmt = conn.createStatement();
+                             ResultSet rs = stmt.executeQuery("SELECT USN, Pw FROM STUDENT_USER")) {
 
-                        // Establish the connection
-                        conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+                            // Loop through the result set and display data in the table
+                            while (rs.next()) {
+                                String usn = rs.getString("USN");
+                                String password = rs.getString("Pw"); // Consider security implications
 
-                        // Create a statement to execute SQL queries
-                        stmt = conn.createStatement();
-
-                        // SQL query to fetch data from STUDENT_USER table
-                        String sql = "SELECT Email, Pw, Student_Role, USN FROM STUDENT_USER";
-
-                        // Execute the query and get the result set
-                        rs = stmt.executeQuery(sql);
-
-                        // Loop through the result set and display data in the table
-                        while (rs.next()) {
-                            String email = rs.getString("Email");
-                            String password = rs.getString("Pw");
-                            String role = rs.getString("Student_Role");
-                            String usn = rs.getString("USN");
-
-                            // Output each row in the table
-                            out.println("<tr><td>" + email + "</td><td>" + password + "</td><td>" + role + "</td><td>" + usn + "</td></tr>");
+                                // Output each row in the table
+                                out.println("<tr><td>" + usn + "</td><td>" + password + "</td></tr>");
+                            }
+                        } catch (SQLException e) {
+                            out.println("<tr><td colspan='2'>Error retrieving student users. Please try again later.</td></tr>");
+                            e.printStackTrace(); // Keep for debugging, consider logging in production
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        // Close the result set, statement, and connection
-                        try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
-                        try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
-                        try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
-                    }
-                %>
-            </tbody>
-        </table>
+                    %>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Footer -->

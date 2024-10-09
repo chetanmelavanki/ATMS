@@ -63,7 +63,6 @@
         
         <!-- JSP Logic to handle form submission and DB insertion -->
         <%
-            String email = request.getParameter("email");
             String password = request.getParameter("password");
             String facultyId = request.getParameter("facultyId");
             String facultyRole = request.getParameter("facultyRole"); // Role selected by the user
@@ -73,16 +72,15 @@
             String dbPassword = "ROOT"; // Update with your DB password
             String message = "";
 
-            if (email != null && password != null && facultyId != null && facultyRole != null) {
+            if (password != null && facultyId != null && facultyRole != null) {
                 try {
                     Class.forName("com.mysql.cj.jdbc.Driver"); // Load the MySQL driver
                     Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
-                    String sql = "INSERT INTO FACULTY_USER (Email, Pw, Faculty_Role, Faculty_Id) VALUES (?, ?, ?, ?)";
+                    String sql = "INSERT INTO FACULTY_USER (Pw, Faculty_Role, Faculty_Id) VALUES (?, ?, ?)";
                     PreparedStatement stmt = conn.prepareStatement(sql);
-                    stmt.setString(1, email);
-                    stmt.setString(2, password);
-                    stmt.setString(3, facultyRole);
-                    stmt.setString(4, facultyId);
+                    stmt.setString(1, password);
+                    stmt.setString(2, facultyRole);
+                    stmt.setString(3, facultyId);
 
                     int rowsInserted = stmt.executeUpdate();
                     if (rowsInserted > 0) {
@@ -102,26 +100,22 @@
 
         <!-- Form to Create Faculty User -->
         <form action="create_faculty.jsp" method="post">
-            <!-- Faculty ID -->
-            <div class="mb-3">
-                <label for="facultyId" class="form-label">Faculty ID</label>
-                <input type="text" name="facultyId" id="facultyId" class="form-control" placeholder="Faculty ID" required>
-            </div>
-            
-            <!-- Faculty Role -->
-            <div class="mb-3">
+             <!-- Faculty Role -->
+             <div class="mb-3">
                 <label for="facultyRole" class="form-label">Role</label>
                 <select name="facultyRole" id="facultyRole" class="form-select" required>
                     <option value="Faculty" selected>Faculty</option>
                 </select>
             </div>
             
-            <!-- Email -->
+            <!-- Faculty ID -->
             <div class="mb-3">
-                <label for="email" class="form-label">Email Address</label>
-                <input type="email" name="email" id="email" class="form-control" placeholder="user@example.com" required>
+                <label for="facultyId" class="form-label">Faculty ID</label>
+                <input type="text" name="facultyId" id="facultyId" class="form-control" placeholder="Faculty ID" required>
             </div>
-
+            
+           
+            
             <!-- Password -->
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>

@@ -62,15 +62,11 @@
         <h4 class="mb-4">Update Faculty User</h4>
         <form action="update_faculty.jsp" method="post">
             <div class="mb-3">
-                <label for="email" class="form-label">Email Address</label>
-                <input type="email" name="email" id="email" class="form-control" placeholder="user@example.com" required>
-            </div>
-            <div class="mb-3">
                 <label for="facultyId" class="form-label">Faculty ID</label>
                 <input type="text" name="facultyId" id="facultyId" class="form-control" placeholder="Faculty ID" required>
             </div>
             <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
+                <label for="password" class="form-label">New Password</label>
                 <input type="password" name="password" id="password" class="form-control">
                 <small class="form-text text-muted">Leave blank to keep the current password.</small>
             </div>
@@ -80,7 +76,6 @@
         <!-- JSP Logic for handling form submission -->
         <%
             // Handling form submission
-            String email = request.getParameter("email");
             String facultyId = request.getParameter("facultyId");
             String password = request.getParameter("password");
             String message = "";
@@ -90,24 +85,16 @@
             String dbUser = "root"; // Update with your DB username
             String dbPassword = "ROOT"; // Update with your DB password
 
-            if (email != null && facultyId != null) {
+            if (facultyId != null) {
                 try {
                     Class.forName("com.mysql.cj.jdbc.Driver"); // Load the MySQL driver
                     Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
 
                     // Update query to change faculty details
-                    String sql = "UPDATE FACULTY_USER SET Faculty_Id = ?, Pw = IF(? = '', Pw, ?) WHERE Email = ?";
+                    String sql = "UPDATE FACULTY_USER SET Pw = COALESCE(NULLIF(?, ''), Pw) WHERE Faculty_Id = ?";
                     PreparedStatement stmt = conn.prepareStatement(sql);
                     stmt.setString(1, facultyId);
-
-                    if (password == null || password.isEmpty()) {
-                        stmt.setNull(2, Types.VARCHAR); // If password is not provided, leave unchanged
-                        stmt.setNull(3, Types.VARCHAR);
-                    } else {
-                        stmt.setString(2, password); // Set new password if provided
-                        stmt.setString(3, password);
-                    }
-                    stmt.setString(4, email);
+                    stmt.setString(2, password); // New password
 
                     int rowsUpdated = stmt.executeUpdate();
                     if (rowsUpdated > 0) {
