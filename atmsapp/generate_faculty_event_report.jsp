@@ -7,17 +7,15 @@
 <%@ page import="com.itextpdf.layout.element.Table" %>
 <%@ page import="com.itextpdf.layout.element.Cell" %>
 <%@ page import="java.io.*" %>
-<%@ page import="com.itextpdf.text.Document, com.itextpdf.text.DocumentException, com.itextpdf.text.pdf.PdfWriter, com.itextpdf.text.Paragraph, com.itextpdf.text.pdf.PdfPTable, com.itextpdf.text.pdf.PdfPCell" %>
-
 
 <%
-    String usn = request.getParameter("usn");
-    String studentName = "";
+    String facultyId = request.getParameter("facultyId");
+    String facultyName = "";
     int eventCount = 0;
 
     // Set response type for PDF
     response.setContentType("application/pdf");
-    response.setHeader("Content-Disposition", "attachment; filename=event_report.pdf");
+    response.setHeader("Content-Disposition", "attachment; filename=faculty_event_report.pdf");
 
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     Connection connection = null;
@@ -31,39 +29,39 @@
         Class.forName("com.mysql.cj.jdbc.Driver");
         connection = DriverManager.getConnection(dbURL, dbUser, dbPassword);
 
-        // Query to fetch student name
-        String studentQuery = "SELECT Student_Name FROM STUDENT WHERE USN = ?";
-        PreparedStatement studentStatement = connection.prepareStatement(studentQuery);
-        studentStatement.setString(1, usn);
-        
-        ResultSet studentResultSet = studentStatement.executeQuery();
-        
-        if (studentResultSet.next()) {
-            studentName = studentResultSet.getString("Student_Name");
+        // Query to fetch faculty name
+        String facultyQuery = "SELECT Faculty_Name FROM FACULTY WHERE Faculty_ID = ?";
+        PreparedStatement facultyStatement = connection.prepareStatement(facultyQuery);
+        facultyStatement.setString(1, facultyId);
+
+        ResultSet facultyResultSet = facultyStatement.executeQuery();
+
+        if (facultyResultSet.next()) {
+            facultyName = facultyResultSet.getString("Faculty_Name");
         } else {
-            throw new Exception("Student not found for USN: " + usn);
+            throw new Exception("Faculty not found for ID: " + facultyId);
         }
 
-        // Query to fetch event details for the student
-        String eventQuery = "SELECT E.Event_Name, SI.Student_Involvement_Date, SI.Student_Involvement_Type " +
-                            "FROM STUDENT_INVOLVEMENT SI " +
-                            "JOIN EVENT E ON SI.Event_Id = E.Event_Id " +
-                            "WHERE SI.USN = ?";
-        
+        // Query to fetch event details for the faculty
+        String eventQuery = "SELECT E.Event_Name, FI.Faculty_Involvement_Date, FI.Faculty_Involvement_Type " +
+                            "FROM FACULTY_INVOLVEMENT FI " +
+                            "JOIN EVENT E ON FI.Event_Id = E.Event_Id " +
+                            "WHERE FI.Faculty_ID = ?";
+
         PreparedStatement eventStatement = connection.prepareStatement(eventQuery);
-        eventStatement.setString(1, usn);
-        
+        eventStatement.setString(1, facultyId);
+
         ResultSet eventResultSet = eventStatement.executeQuery();
-        
+
         // Create PDF document
         PdfWriter pdfWriter = new PdfWriter(byteArrayOutputStream);
         PdfDocument pdfDocument = new PdfDocument(pdfWriter);
         Document document = new Document(pdfDocument);
 
         // Add content to the PDF
-        document.add(new Paragraph("Event Participation Report").setFontSize(20));
-        document.add(new Paragraph("USN: " + usn));
-        document.add(new Paragraph("Name: " + studentName));
+        document.add(new Paragraph("Faculty Event Involvement Report").setFontSize(20));
+        document.add(new Paragraph("Faculty ID: " + facultyId));
+        document.add(new Paragraph("Name: " + facultyName));
         document.add(new Paragraph("\n"));
 
         // Create a table for event details
@@ -75,8 +73,8 @@
         // Populate the table with event data
         while (eventResultSet.next()) {
             String eventName = eventResultSet.getString("Event_Name");
-            String involvementDate = eventResultSet.getString("Student_Involvement_Date");
-            String involvementType = eventResultSet.getString("Student_Involvement_Type");
+            String involvementDate = eventResultSet.getString("Faculty_Involvement_Date");
+            String involvementType = eventResultSet.getString("Faculty_Involvement_Type");
 
             // Adding cells to the table
             table.addCell(new Cell().add(new Paragraph(eventName)));
@@ -87,7 +85,7 @@
 
         // Add the table to the document
         document.add(table);
-        document.add(new Paragraph("Number of Events Participated: " + eventCount));
+        document.add(new Paragraph("Number of Events Involved: " + eventCount));
 
         // Close the document
         document.close();
@@ -96,7 +94,7 @@
         byte[] pdfBytes = byteArrayOutputStream.toByteArray();
         response.getOutputStream().write(pdfBytes);
         response.getOutputStream().flush();
-        
+
     } catch (Exception e) {
         e.printStackTrace(); // Print the stack trace for debugging
         response.getWriter().write("Error generating PDF: " + e.getMessage());

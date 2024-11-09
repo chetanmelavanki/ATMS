@@ -96,7 +96,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Manage Subjects</h5>
                         <p class="card-text">View and edit subject details.</p>
-                        <a href="manage-subjects.jsp?facultyId=<%= facultyId %>" class="btn btn-primary">Go to Subjects</a>
+                        <a href="faculty_subject_allocation.jsp?facultyId=<%= facultyId %>" class="btn btn-primary">Go to Subjects</a>
                     </div>
                 </div>
             </div>
