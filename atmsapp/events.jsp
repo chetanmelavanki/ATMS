@@ -133,7 +133,7 @@
                         <td><%= semester %></td>
                         <td>
                             <!-- Link to the application form, passing the USN and event ID as parameters -->
-                            <a href="event_apply.jsp?usn=<%= usn %>&event_id=<%= eventId %>" class="btn btn-primary">Apply</a>
+                            <a href="student_event_apply.jsp?usn=<%= usn %>&event_id=<%= eventId %>" class="btn btn-primary">Apply</a>
                         </td>
                     </tr>
                     <% } %>
