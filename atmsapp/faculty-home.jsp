@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.sql.*" %>
 <%
     String facultyId = request.getParameter("facultyId");
@@ -87,7 +87,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Manage Events</h5>
                         <p class="card-text">Create, update, and delete events.</p>
-                        <a href="manage-events.jsp?facultyId=<%= facultyId %>" class="btn btn-primary">Go to Events</a>
+                        <a href="faculty_events.jsp?facultyId=<%= facultyId %>" class="btn btn-primary">Go to Events</a>
                     </div>
                 </div>
             </div>

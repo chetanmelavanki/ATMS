@@ -98,7 +98,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Manage Subjects</h5>
                         <p class="card-text">View and manage your enrolled courses. Update your preferences and more.</p>
-                        <a href=".jsp" class="btn btn-primary">Go to Subjects</a>
+                        <a href="subject-allocation.jsp?usn=<%= usn %>" class="btn btn-primary">Go to Subjects</a>
                     </div>
                 </div>
             </div>
