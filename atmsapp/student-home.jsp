@@ -107,7 +107,7 @@
                     <div class="card-body">
                         <h5 class="card-title">View Assessments</h5>
                         <p class="card-text">Check your upcoming assessments and track your performance.</p>
-                        <a href="view-assessments.jsp" class="btn btn-primary">View Assessments</a>
+                        <a href="view_students_assessments.jsp?usn=<%= usn %>" class="btn btn-primary">View Assessments</a>
                     </div>
                 </div>
             </div>

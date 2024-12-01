@@ -73,7 +73,7 @@
                         <td><%= branchId %></td>
                         <td><%= semester %></td>
                         <td>
-                            <form action="faculty_event_apply.jsp" method="get">
+                            <form action="faculty_event_apply.jsp?facultyId=<%= facultyId %>" method="get">
                                 <input type="hidden" name="facultyId" value="<%= facultyId %>">
                                 <!-- Hidden input for passing eventId -->
                                 <input type="hidden" name="eventId" value="<%= eventId %>">

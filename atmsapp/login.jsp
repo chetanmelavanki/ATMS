@@ -39,6 +39,28 @@
             document.getElementById("facultyFields").style.display = (role === "Faculty") ? "block" : "none";
             document.getElementById("adminFields").style.display = (role === "Admin") ? "block" : "none";
         }
+
+        function validateForm() {
+            var role = document.getElementById("userRole").value;
+            if (role === "Student") {
+                var usn = document.getElementById("usn").value;
+                var prefix = "2BA23MC";
+                var regex = new RegExp("^" + prefix + "(\\d{3})$"); // Ensure prefix and 3 digits
+                var match = usn.match(regex);
+
+                if (!match) {
+                    alert("USN should start with '2BA23MC' followed by 001 to 060.");
+                    return false;
+                }
+
+                var number = parseInt(match[1]);
+                if (number < 1 || number > 60) {
+                    alert("The last three digits of the USN should be between 001 and 060.");
+                    return false;
+                }
+            }
+            return true;
+        }
     </script>
 </head>
 <body>
@@ -58,7 +80,7 @@
     <div class="container d-flex justify-content-center align-items-center flex-grow-1">
         <div class="login-box">
             <h3 class="text-center mb-4">Login</h3>
-            <form method="post">
+            <form method="post" onsubmit="return validateForm();">
                 <div class="mb-3">
                     <label for="userRole" class="form-label">Role</label>
                     <select id="userRole" name="userRole" class="form-select" required onchange="showFields()">

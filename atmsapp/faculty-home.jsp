@@ -109,6 +109,16 @@
                     </div>
                 </div>
             </div>
+            <!-- New card for assessment -->
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Assessment Giving to Students</h5>
+                        <p class="card-text">Assign and manage assessments for your students.</p>
+                        <a href="faculty_assign_assessment_to_students.jsp?facultyId=<%= facultyId %>" class="btn btn-primary">Go to Assessments</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
